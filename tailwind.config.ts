@@ -47,6 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        threads: {
+          gray: "hsl(var(--threads-gray))",
+          "light-gray": "hsl(var(--threads-light-gray))",
+          hover: "hsl(var(--threads-hover))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
