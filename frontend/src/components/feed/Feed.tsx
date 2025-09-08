@@ -3,7 +3,6 @@ import CreatePost from "@/components/post/CreatePost";
 import { useEffect, useState } from "react";
 
 
-
 const Feed = () => {
   const [posts, setPosts] = useState([]);
 
