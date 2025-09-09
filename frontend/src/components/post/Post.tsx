@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface PostProps {
@@ -21,11 +21,16 @@ interface PostProps {
 const Post = ({ author, content, timestamp, likes, replies, reposts }: PostProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
   };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  }
 
   return (
     <article className="threads-card border-b px-4 py-6 hover:bg-accent/50 transition-colors">
@@ -47,9 +52,30 @@ const Post = ({ author, content, timestamp, likes, replies, reposts }: PostProps
               <h3 className="font-semibold text-sm">{author.username}</h3>
               <span className="text-threads-gray text-sm">{timestamp}</span>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-threads-gray hover:text-foreground">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            <div className="relative">
+              <Button 
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-threads-gray hover:text-foreground"
+                onClick={toggleMenu}>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+               {menuOpen && (
+                <div className="absolute right-0 mt-2 w-32 bg-popover border border-border rounded-md shadow-lg z-10">
+                  <button
+                    className="w-full px-4 py-2 text-sm text-left text-destructive hover:bg-destructive/10 flex items-center gap-2"
+                    onClick={() => {
+                      // TODO: implementa handleDelete()
+                      setMenuOpen(false);
+                      console.log("Delete clicked"); // temporaneo
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Post content */}
