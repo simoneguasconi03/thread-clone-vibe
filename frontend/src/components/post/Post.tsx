@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Trash2 } from "lucide-react";
 import { useState } from "react";
+import api from "@/api";
 
 interface PostProps {
   id: string;
@@ -16,9 +17,10 @@ interface PostProps {
   replies: number;
   reposts: number;
   images?: string[];
+  onDelete: (id: string) => void;
 }
 
-const Post = ({ author, content, timestamp, likes, replies, reposts }: PostProps) => {
+const Post = ({ id, author, content, timestamp, likes, replies, reposts, onDelete }: PostProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,6 +33,15 @@ const Post = ({ author, content, timestamp, likes, replies, reposts }: PostProps
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   }
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`posts/${id}/`);
+      onDelete(id);  
+    } catch (error) {
+      console.error("Error deleting post ", error);
+    }
+  };
 
   return (
     <article className="threads-card border-b px-4 py-6 hover:bg-accent/50 transition-colors">
@@ -65,9 +76,8 @@ const Post = ({ author, content, timestamp, likes, replies, reposts }: PostProps
                   <button
                     className="w-full px-4 py-2 text-sm text-left text-destructive hover:bg-destructive/10 flex items-center gap-2"
                     onClick={() => {
-                      // TODO: implementa handleDelete()
+                      handleDelete();
                       setMenuOpen(false);
-                      console.log("Delete clicked"); // temporaneo
                     }}
                   >
                     <Trash2 className="w-4 h-4" />

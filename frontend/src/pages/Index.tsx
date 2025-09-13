@@ -2,10 +2,14 @@ import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import Feed from "@/components/feed/Feed";
 
-const Index = () => {
+interface IndexProps {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Index = ({ setIsAuthenticated }: IndexProps) => {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header setIsAuthenticated={setIsAuthenticated} />
       
       <div className="flex">
         <Sidebar />

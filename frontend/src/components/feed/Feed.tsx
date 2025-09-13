@@ -17,6 +17,10 @@ const Feed = () => {
     setPosts([newPost, ...posts]);
   }
 
+  const handleDelete = (postId: string) => {
+    setPosts(posts.filter(post => post.id !== postId));
+  };
+
   return (
     <div className="max-w-2xl mx-auto bg-background">
       <CreatePost onPostCreated={handleNewPost}/>
@@ -27,15 +31,16 @@ const Feed = () => {
             key={post.id} 
             {...post}
             author={{
-              username: "anon",
-              displayName: "Anonymous",
+              username: post.author,
+              displayName: post.author,
               avatar: "",
               verified: false,
             }}
             timestamp={new Date(post.created_at).toLocaleTimeString()}
             likes={0}
             replies={0}
-            reposts={0} />
+            reposts={0}
+            onDelete={handleDelete} />
         ))}
       </div>
     </div>

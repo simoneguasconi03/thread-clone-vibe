@@ -1,7 +1,25 @@
 from rest_framework import serializers
 from .models import Post
+from django.contrib.auth.models import User
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+    def create(self, validated_data):
+        return User.objects.create_user(
+            username=validated_data['username'],
+            password=validated_data['password']
+        )
 
 class PostSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+    created_at = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['id', 'author', 'content', 'created_at']
+        read_only_fields = ['id', 'author', 'created_at']

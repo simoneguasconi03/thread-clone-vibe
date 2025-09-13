@@ -1,7 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const Header = () => {
+interface HeaderProps {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Header = ({ setIsAuthenticated }: HeaderProps) => {
+  const navigate = useNavigate();
+
+  const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); 
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    setIsAuthenticated(false);
+    navigate("/auth", { replace: true });
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
@@ -23,9 +38,16 @@ const Header = () => {
           />
         </div>
 
-        {/* Profile */}
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-full bg-primary"></div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            aria-label="Logout"
+            title="Logout"
+          >
+            <LogOut className="h-6 w-6 text-black" />
+          </Button>
         </div>
       </div>
     </header>

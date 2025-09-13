@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import api from "@/api";
 
 type CreatePostProps = {
   onPostCreated: (newPost: any) => void;
@@ -15,19 +16,9 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/api/posts/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content }),
-      });
+      const response = await api.post('posts/', { content });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const newPost = await response.json();
+      const newPost = await response.data;
       onPostCreated(newPost);
       setContent("");
     } catch (error) {
