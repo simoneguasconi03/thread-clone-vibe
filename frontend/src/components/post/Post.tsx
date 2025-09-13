@@ -74,13 +74,13 @@ const Post = ({ id, author, content, timestamp, likes, replies, reposts, onDelet
                {menuOpen && (
                 <div className="absolute right-0 mt-2 w-32 bg-popover border border-border rounded-md shadow-lg z-10">
                   <button
-                    className="w-full px-4 py-2 text-sm text-left text-destructive hover:bg-destructive/10 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-sm text-left hover:bg-gray-200 flex items-center gap-2"
                     onClick={() => {
                       handleDelete();
                       setMenuOpen(false);
                     }}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4 text-black" />
                     Delete
                   </button>
                 </div>
