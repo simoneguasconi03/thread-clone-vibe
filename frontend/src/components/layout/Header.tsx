@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Search, Menu, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import api from "@/api";
 
 interface HeaderProps {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -8,6 +10,47 @@ interface HeaderProps {
 
 const Header = ({ setIsAuthenticated }: HeaderProps) => {
   const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (query.trim() === "") {
+      setResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      const fetchData = async () => {
+        try {
+          const res = await api.get('users/search', { params: { q: query } });
+          console.log("API response:", res.data);
+          setResults(res.data.data);
+          setShowResults(true);
+        } catch (error) {
+          console.error("Errore nella ricerca utenti:", error);
+        }
+      };
+      fetchData();
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); 
@@ -29,13 +72,38 @@ const Header = ({ setIsAuthenticated }: HeaderProps) => {
         </div>
 
         {/* Search */}
-        <div className="flex-1 max-w-md mx-4 relative">
+        <div className="flex-1 max-w-md mx-4 relative" ref={containerRef}>
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setShowResults(true)} // mostra sempre quando c’è focus
             placeholder="Search"
-            className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted border-0 focus:ring-2 focus:ring-ring focus:outline-none transition-all"
+            className="w-full h-10 pl-10 pr-4 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ring focus:outline-none transition-all"
           />
+
+          {/* Dropdown risultati */}
+          {showResults && results.length > 0 && (
+            <ul className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md z-50 max-h-60 overflow-y-auto">
+              {results.map((user) => (
+                <li
+                  key={user.id}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex flex-col"
+                  onClick={() => {
+                    navigate(`/profile/${user.username}`);
+                    setShowResults(false);
+                    setQuery("");
+                  }}
+                >
+                  <span className="font-medium">@{user.username}</span>
+                  <span className="text-sm text-gray-500">
+                    {user.first_name} {user.last_name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">

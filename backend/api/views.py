@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from .models import Post
 from .serializers import PostSerializer, RegisterSerializer
 
@@ -52,3 +54,23 @@ def delete_post_view(request, post_id):
     
     post.delete()
     return Response({'detail': 'Post deleted.'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticatedOrReadOnly]) 
+def user_search_view(request):
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return Response({'data': [], 'total': 0})
+
+    User = get_user_model()
+    
+    users = User.objects.filter(
+        Q(username__icontains=query) |
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query)
+    ).values('id', 'username', 'first_name', 'last_name')[:20]  # limite di 20 risultati
+
+    return Response({
+        'data': list(users),
+        'total': len(users)
+    })
