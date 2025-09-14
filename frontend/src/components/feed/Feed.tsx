@@ -37,7 +37,8 @@ const Feed = () => {
               verified: false,
             }}
             timestamp={new Date(post.created_at).toLocaleTimeString()}
-            likes={0}
+            likes={post.likes_count}
+            liked_by_user={post.liked_by_user}
             replies={0}
             reposts={0}
             onDelete={handleDelete} />

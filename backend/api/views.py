@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Post
+from .models import Post, PostLike
 from .serializers import PostSerializer, RegisterSerializer
 
 
@@ -31,11 +31,11 @@ class RegisterView(GenericAPIView):
 def posts_view(request):
     if request.method == 'GET':
         posts = Post.objects.all().order_by('-created_at')
-        serializer = PostSerializer(posts, many=True)
+        serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = PostSerializer(data=request.data)
+        serializer = PostSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(author=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -74,3 +74,34 @@ def user_search_view(request):
         'data': list(users),
         'total': len(users)
     })
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def like_post(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return Response({'detail': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    if PostLike.objects.filter(user=request.user, post=post).exists():
+        return Response({'detail': 'Already liked.'}, status=status.HTTP_200_OK)
+
+    PostLike.objects.create(user=request.user, post=post)
+    post.refresh_from_db()
+    return Response({'detail': 'Post liked.', 'likes_count': post.likes.count()}, status=status.HTTP_201_CREATED)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def unlike_post(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return Response({'detail': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    like = PostLike.objects.filter(user=request.user, post=post)
+    if like.exists():
+        like.delete()
+        post.refresh_from_db() 
+        return Response({'detail': 'Like removed.', 'likes_count': post.likes.count()}, status=status.HTTP_200_OK)
+
+    return Response({'detail': 'Like does not exist.', 'likes_count': post.likes.count()}, status=status.HTTP_200_OK)

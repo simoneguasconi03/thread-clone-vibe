@@ -14,20 +14,32 @@ interface PostProps {
   content: string;
   timestamp: string;
   likes: number;
+  liked_by_user: boolean; 
   replies: number;
   reposts: number;
   images?: string[];
   onDelete: (id: string) => void;
 }
 
-const Post = ({ id, author, content, timestamp, likes, replies, reposts, onDelete }: PostProps) => {
-  const [isLiked, setIsLiked] = useState(false);
+const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, reposts, onDelete }: PostProps) => {
+  const [isLiked, setIsLiked] = useState(liked_by_user); 
   const [likeCount, setLikeCount] = useState(likes);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+  const handleLike = async () => {
+    try {
+      if (!isLiked) {
+        const res = await api.post(`posts/${id}/like/`);
+        setIsLiked(true);
+        setLikeCount(res.data.likes_count);
+      } else {
+        const res = await api.delete(`posts/${id}/unlike/`);
+        setIsLiked(false);
+        setLikeCount(res.data.likes_count);
+      }
+    } catch (error) {
+      console.error("Error during like/unlike:", error);
+    }
   };
 
   const toggleMenu = () => {
@@ -101,7 +113,11 @@ const Post = ({ id, author, content, timestamp, likes, replies, reposts, onDelet
               className="threads-button text-threads-gray hover:text-foreground -ml-2"
               onClick={handleLike}
             >
-              <Heart className={`h-5 w-5 mr-2 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              <Heart
+                className={`h-5 w-5 mr-2 transition-colors duration-200 ${
+                  isLiked ? 'fill-red-500 text-red-500' : 'text-threads-gray'
+                }`}
+              />
               <span className="text-sm">{likeCount}</span>
             </Button>
 
