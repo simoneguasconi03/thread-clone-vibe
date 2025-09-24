@@ -21,10 +21,14 @@ class PostSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     liked_by_user = serializers.SerializerMethodField()
 
+    parent = serializers.PrimaryKeyRelatedField(read_only=True)
+    replies_count = serializers.SerializerMethodField()
+    replies = serializers.SerializerMethodField()
+
     class Meta:
         model = Post
-        fields = ['id', 'author', 'content', 'created_at', 'likes_count', 'liked_by_user']
-        read_only_fields = ['id', 'author', 'created_at', 'likes_count', 'liked_by_user']
+        fields = ['id', 'author', 'content', 'created_at', 'likes_count', 'liked_by_user', 'parent', 'replies_count', 'replies']
+        read_only_fields = ['id', 'author', 'created_at', 'likes_count', 'liked_by_user', 'parent', 'replies_count', 'replies']
 
     def get_likes_count(self, obj):
         return obj.likes.count()
@@ -34,3 +38,11 @@ class PostSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.likes.filter(id=request.user.id).exists()
         return False
+    
+    def get_replies_count(self, obj):
+        return Post.objects.filter(parent=obj).count()
+    
+    def get_replies(self, obj):
+        comments = Post.objects.filter(parent=obj).order_by('created_at')
+        serializer = PostSerializer(comments, many=True, context=self.context)
+        return serializer.data

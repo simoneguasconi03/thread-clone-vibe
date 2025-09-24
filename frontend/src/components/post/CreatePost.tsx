@@ -42,7 +42,7 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
             placeholder="What's new?"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="min-h-[100px] border-0 bg-transparent p-0 text-lg placeholder:text-threads-gray focus-visible:ring-0 resize-none"
+            className="min-h-[100px] border-0 bg-transparent p-0 text-lg placeholder:text-threads-gray focus-visible:ring-3 resize-none"
           />
           
           <div className="flex items-center justify-between mt-4">

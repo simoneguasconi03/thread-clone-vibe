@@ -25,6 +25,10 @@ const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, r
   const [isLiked, setIsLiked] = useState(liked_by_user); 
   const [likeCount, setLikeCount] = useState(likes);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [showComments, setShowComments] = useState(false);
+  const [replyCount, setReplyCount] = useState(replies);
 
   const handleLike = async () => {
     try {
@@ -52,6 +56,31 @@ const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, r
       onDelete(id);  
     } catch (error) {
       console.error("Error deleting post ", error);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const res = await api.get(`posts/${id}/comments/`);
+      setComments(res.data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  const submitComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      const res = await api.post(`posts/${id}/comment/`, {
+        content: newComment,
+      });
+
+      setComments(prev => [...prev, res.data]);
+      setNewComment("");
+      setReplyCount(prev => prev + 1);
+    } catch (error) {
+      console.error("Error submitting comment:", error);
     }
   };
 
@@ -125,9 +154,13 @@ const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, r
               variant="ghost"
               size="sm"
               className="threads-button text-threads-gray hover:text-foreground"
+              onClick={() => {
+                setShowComments(!showComments);
+                if (!showComments) fetchComments();
+              }}
             >
               <MessageCircle className="h-5 w-5 mr-2" />
-              <span className="text-sm">{replies}</span>
+              <span className="text-sm">{replyCount}</span>
             </Button>
 
             <Button
@@ -147,6 +180,34 @@ const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, r
               <Share className="h-5 w-5" />
             </Button>
           </div>
+          {showComments && (
+            <div className="mt-4 space-y-4">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  className="flex-1 border rounded px-3 py-1 text-sm"
+                  placeholder="Scrivi un commento..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+                <Button size="sm" onClick={submitComment}>
+                  Send
+                </Button>
+              </div>
+
+              {comments.length > 0 ? (
+                <ul className="space-y-2">
+                  {comments.map((comment) => (
+                    <li key={comment.id} className="border-l pl-3 text-sm text-muted-foreground">
+                      <strong>{comment.author}</strong>: {comment.content}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">Nessun commento ancora.</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </article>

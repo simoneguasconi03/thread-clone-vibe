@@ -78,9 +78,9 @@ const Header = ({ setIsAuthenticated }: HeaderProps) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setShowResults(true)} // mostra sempre quando c’è focus
+            onFocus={() => setShowResults(true)} 
             placeholder="Search"
-            className="w-full h-10 pl-10 pr-4 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-ring focus:outline-none transition-all"
+            className="w-full h-10 pl-10 pr-4 rounded-lg bg-white border border-gray-300 focus:ring-3 focus:outline-none "
           />
 
           {/* Dropdown risultati */}

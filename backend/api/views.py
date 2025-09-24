@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from .models import Post, PostLike
 from .serializers import PostSerializer, RegisterSerializer
@@ -30,7 +31,7 @@ class RegisterView(GenericAPIView):
 @permission_classes([IsAuthenticatedOrReadOnly])
 def posts_view(request):
     if request.method == 'GET':
-        posts = Post.objects.all().order_by('-created_at')
+        posts = Post.objects.filter(parent__isnull=True).order_by('-created_at')
         serializer = PostSerializer(posts, many=True, context={'request': request})
         return Response(serializer.data)
 
@@ -84,11 +85,13 @@ def like_post(request, post_id):
         return Response({'detail': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
 
     if PostLike.objects.filter(user=request.user, post=post).exists():
-        return Response({'detail': 'Already liked.'}, status=status.HTTP_200_OK)
+        serializer = PostSerializer(post, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     PostLike.objects.create(user=request.user, post=post)
     post.refresh_from_db()
-    return Response({'detail': 'Post liked.', 'likes_count': post.likes.count()}, status=status.HTTP_201_CREATED)
+    serializer = PostSerializer(post, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticatedOrReadOnly])
@@ -102,6 +105,26 @@ def unlike_post(request, post_id):
     if like.exists():
         like.delete()
         post.refresh_from_db() 
-        return Response({'detail': 'Like removed.', 'likes_count': post.likes.count()}, status=status.HTTP_200_OK)
+    
+    serializer = PostSerializer(post, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
-    return Response({'detail': 'Like does not exist.', 'likes_count': post.likes.count()}, status=status.HTTP_200_OK)
+@api_view(['GET'])
+def get_commments(request, post_id):
+    parent_post = get_object_or_404(Post, id=post_id)
+    comments = parent_post.replies.all().order_by('-created_at')
+    serializer = PostSerializer(comments, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def create_comment(request, post_id):
+    parent_post = get_object_or_404(Post, id=post_id)
+    content = request.data.get('content')
+    if not content:
+        return Response({'detail': 'Content is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    comment = Post.objects.create(author=request.user, content=content, parent=parent_post)
+    comment.refresh_from_db()
+    serializer = PostSerializer(comment, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_201_CREATED)

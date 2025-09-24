@@ -7,11 +7,16 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, through='PostLike', related_name='liked_posts', blank=True)
 
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+
     def __str__(self):
         return self.content[:30]
     
     def likes_count(self):
         return self.likes.count()
+    
+    def is_comment(self):
+        return self.parent is not None
 
 class PostLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
