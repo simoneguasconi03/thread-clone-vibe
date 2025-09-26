@@ -69,14 +69,14 @@ export default function AuthPage({ setIsAuthenticated }: AuthPageProps) {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded px-4 py-2 border border-border bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-input dark:text-foreground dark:border-border"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded px-4 py-2 border border-border bg-input text-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-input dark:text-foreground dark:border-border"
           />
 
           {error && (
@@ -85,9 +85,9 @@ export default function AuthPage({ setIsAuthenticated }: AuthPageProps) {
 
           <button
             onClick={handleAuth}
-            className="w-full rounded bg-primary py-2 text-white hover:bg-primary/90"
+            className="w-full rounded py-2 bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/80"
           >
-            {isLogin ? "Login" : "Registrati"}
+            {isLogin ? "Accedi" : "Registrati"}
           </button>
 
           <div className="text-center text-sm">
@@ -95,7 +95,7 @@ export default function AuthPage({ setIsAuthenticated }: AuthPageProps) {
               <>
                 Non hai un account?{" "}
                 <button
-                  className="text-primary hover:underline"
+                  className="text-blue-600 hover:underline dark:text-blue-400"
                   onClick={() => setIsLogin(false)}
                 >
                   Registrati
@@ -105,7 +105,7 @@ export default function AuthPage({ setIsAuthenticated }: AuthPageProps) {
               <>
                 Hai già un account?{" "}
                 <button
-                  className="text-primary hover:underline"
+                  className="text-blue-600 hover:underline dark:text-blue-400"
                   onClick={() => setIsLogin(true)}
                 >
                   Accedi

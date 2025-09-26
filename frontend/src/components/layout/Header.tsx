@@ -80,24 +80,28 @@ const Header = ({ setIsAuthenticated }: HeaderProps) => {
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setShowResults(true)} 
             placeholder="Search"
-            className="w-full h-10 pl-10 pr-4 rounded-lg bg-white border border-gray-300 focus:ring-3 focus:outline-none "
+            className="w-full h-10 pl-10 pr-4 rounded-lg bg-muted text-muted-foreground border border-border focus:ring-3 focus:ring-primary focus:outline-none dark:bg-muted dark:text-muted-foreground dark:border-border"
           />
 
-          {/* Dropdown risultati */}
+          {/* Dropdown */}
           {showResults && results.length > 0 && (
-            <ul className="absolute mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md z-50 max-h-60 overflow-y-auto">
+            <ul className="absolute mt-1 w-full bg-card border border-border rounded-md shadow-md z-50 max-h-60 overflow-y-auto
+                          dark:bg-card dark:border-border">
               {results.map((user) => (
                 <li
                   key={user.id}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex flex-col"
+                  className="px-4 py-2 cursor-pointer flex flex-col
+                            hover:bg-accent dark:hover:bg-accent"
                   onClick={() => {
                     navigate(`/profile/${user.username}`);
                     setShowResults(false);
                     setQuery("");
                   }}
                 >
-                  <span className="font-medium">@{user.username}</span>
-                  <span className="text-sm text-gray-500">
+                  <span className="font-medium text-card-foreground dark:text-card-foreground">
+                    @{user.username}
+                  </span>
+                  <span className="text-sm text-muted-foreground dark:text-muted-foreground">
                     {user.first_name} {user.last_name}
                   </span>
                 </li>
@@ -114,7 +118,7 @@ const Header = ({ setIsAuthenticated }: HeaderProps) => {
             aria-label="Logout"
             title="Logout"
           >
-            <LogOut className="h-6 w-6 text-black" />
+           <LogOut className="h-6 w-6 text-foreground dark:text-foreground" />
           </Button>
         </div>
       </div>

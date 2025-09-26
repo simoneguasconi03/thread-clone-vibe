@@ -112,16 +112,19 @@ const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, r
                 onClick={toggleMenu}>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
-               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-popover border border-border rounded-md shadow-lg z-10">
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-32 bg-popover border border-border rounded-md shadow-lg z-10
+                                dark:bg-popover dark:border-border">
                   <button
-                    className="w-full px-4 py-2 text-sm text-left hover:bg-gray-200 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-sm text-left flex items-center gap-2
+                              hover:bg-accent dark:hover:bg-accent
+                              text-foreground dark:text-foreground"
                     onClick={() => {
                       handleDelete();
                       setMenuOpen(false);
                     }}
                   >
-                    <Trash2 className="w-4 h-4 text-black" />
+                    <Trash2 className="w-4 h-4 text-foreground dark:text-destructive-foreground" />
                     Delete
                   </button>
                 </div>
@@ -185,7 +188,7 @@ const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, r
               <div className="flex space-x-2">
                 <input
                   type="text"
-                  className="flex-1 border rounded px-3 py-1 text-sm"
+                  className="flex-1 rounded px-3 py-1 text-sm bg-input text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-primary dark:bg-input dark:text-foreground dark:border-border"
                   placeholder="Scrivi un commento..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
