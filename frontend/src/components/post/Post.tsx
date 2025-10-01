@@ -85,7 +85,7 @@ const Post = ({ id, author, content, timestamp, likes, liked_by_user, replies, r
   };
 
   return (
-    <article className="bg-[#1a1a1a] rounded-xl p-4 mb-4 shadow-sm hover:bg-[#232323] transition-colors duration-200">
+    <article className="bg-card text-card-foreground dark:bg-[#1a1a1a] dark:text-white rounded-xl p-4 shadow-sm mb-4">
       <div className="flex space-x-3">
         {/* Avatar */}
         <div className="flex-shrink-0">

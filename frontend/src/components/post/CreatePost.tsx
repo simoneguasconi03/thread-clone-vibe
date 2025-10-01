@@ -27,7 +27,7 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
   };
 
   return (
-    <div className="bg-[#1a1a1a] rounded-xl p-4 mb-4 shadow-sm">
+    <div className="bg-card text-card-foreground dark:bg-[#1a1a1a] dark:text-white rounded-xl p-4 mb-4 shadow-sm">
       <div className="flex space-x-3">
         {/* Avatar */}
         <div className="flex-shrink-0">
